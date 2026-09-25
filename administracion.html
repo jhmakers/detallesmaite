@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="estilos.css">
+</head>
+
+<body onload="verificarAccesoAdmin(); cargarAdmin()">
+
+<header>
+<h1>🌸 PANEL ADMINISTRADOR</h1>
+</header>
+
+<div class="contenedor">
+
+<section class="tarjeta">
+<h2>⚙️ Configuración de tienda</h2>
+
+<label>Nombre de tienda</label>
+<input id="nombreTienda" placeholder="Nombre de la tienda">
+
+
+<label>Numero de contacto</label>
+<input id="contactoTienda" placeholder="Ejemplo: 999999999">
+
+<label>Contraseña del panel administrador</label>
+<input id="claveAdmin" type="password" placeholder="Cambiar contraseña">
+
+<label>Logo de tienda</label>
+<label style="margin-top:15px;display:block">Logo de aplicación PWA (icono del celular)</label>
+<input type="file" id="logoPWAInput" accept=".png,.jpg,.jpeg">
+<img id="logoPWAVista" class="preview">
+<p>Recomendado: imagen cuadrada 512x512 px</p>
+
+<input type="file" id="logoInput" accept=".png,.jpg,.jpeg,.svg">
+
+<img id="logoVista" class="preview">
+
+<button onclick="guardarTienda()">GUARDAR CAMBIOS</button>
+
+</section>
+
+
+<section class="tarjeta">
+<h2>🛍️ Crear producto</h2>
+
+<label>Imagen del producto</label>
+<input type="file" id="productoInput" accept=".png,.jpg,.jpeg,.svg">
+
+<img id="productoVista" class="preview">
+
+<label>Nombre del producto</label>
+<input id="nombreProducto" placeholder="Ejemplo: Ramo de rosas">
+
+<label>Código de barras (opcional)</label>
+<div style="display:flex;gap:8px;align-items:center">
+<input id="codigoProducto" placeholder="Escanee o escriba un código">
+<button type="button" onclick="abrirEscanerProducto()">📷 Escanear</button>
+</div>
+<small>Si no coloca código, el sistema generará uno automáticamente.</small>
+
+<label>Precio</label>
+<input id="precioProducto" type="number" placeholder="S/. 25">
+
+<div class="codigo">
+Código generado:
+<strong id="codigoVista">Se generará automáticamente</strong>
+</div>
+
+<button onclick="crearProducto()">CREAR PRODUCTO</button>
+
+</section>
+
+
+<section class="tarjeta">
+<h2>📦 Productos registrados</h2>
+<input id="buscadorAdmin" class="buscador" placeholder="🔎 Buscar por nombre o código" onkeyup="buscarAdmin()">
+
+<div id="listaProductos"></div>
+
+</section>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="firebase-cloud.js"></script>
+<script src="app.js"></script>
+
+<script src="ticket_canvas.js"></script></body>
+</html>

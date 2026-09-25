@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="estilos.css">
+</head>
+
+<body onload="cargarPedido()">
+
+<header>
+<h1>🛒 Generar Pedido</h1>
+</header>
+
+<div class="card">
+
+<h2>Producto seleccionado</h2>
+
+<div id="productoPedido"></div>
+
+<input id="cliente" placeholder="Nombre del cliente">
+
+<div class="selector-cantidad">
+<label>Cantidad</label>
+<button class="btn-cantidad" type="button" onclick="cambiarCantidad(1)">+</button>
+<input id="cantidadPedido" type="number" value="1" min="1" oninput="actualizarSubtotalPedido()">
+<button class="btn-cantidad" type="button" onclick="cambiarCantidad(-1)">−</button>
+</div>
+
+
+<div id="totalPedido" style="font-weight:bold">Total: S/. 0</div>
+
+<input id="anticipo" type="number" placeholder="Anticipo S/.">
+
+<label>Fecha de entrega</label>
+<input id="fechaEntrega" type="date">
+<label>Mensaje del pedido</label>
+<textarea id="mensajePedido" placeholder="Ejemplo: Entregar con tarjeta de cumpleaños"></textarea>
+
+
+<button onclick="imprimirTicket()">🖨 Imprimir ticket 80mm</button>
+
+<button onclick="guardarPDF()">📄 Guardar PDF</button>
+
+</div>
+
+<div id="ticket" class="ticket"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-cloud.js"></script>
+<script src="app.js"></script>
+<script src="ticket_canvas.js"></script><script>
+if('serviceWorker' in navigator){
+ navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+</body>
+</html>
+<div id="ticket80" class="ticket80"></div>
+
+

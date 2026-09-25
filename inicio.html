@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="estilos.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" id="iconoTiendaApple" href="icon-tienda.png">
+</head>
+
+<body onload="cargarInicio()">
+
+<header>
+<img id="logoTienda" class="logo">
+<h1 id="titulo">🌸 Tienda Artesanal</h1>
+</header>
+
+<div class="card">
+<button onclick="entrarAdmin()">⚙️ Admin</button>
+<button onclick="location='scanner.html'">📷 Escanear</button>
+<button onclick="location='control_pedidos.html'">📋 Pedidos</button>
+</div>
+
+<h2>Productos disponibles</h2>
+<input id="buscadorInicio" class="buscador" placeholder="🔎 Buscar por nombre o código" onkeyup="buscarInicio()">
+
+<div id="productosInicio" class="grid"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-cloud.js"></script>
+<script src="app.js"></script>
+
+<script src="ticket_canvas.js"></script><script>
+if('serviceWorker' in navigator){
+ navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+</body>
+</html>

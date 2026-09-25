@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="estilos.css">
+<title>Escáner</title>
+
+<script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-cloud.js"></script>
+<script src="app.js"></script>
+<style>
+body{font-family:Arial,sans-serif;text-align:center;background:#f5f5f5;}
+#scanner video{width:100%!important;height:100%!important;object-fit:cover!important;}
+button{padding:12px 25px;border-radius:10px;border:0;background:#222;color:white;font-size:16px;}
+.tarjeta{background:white;margin:12px auto;padding:12px;border-radius:12px;max-width:420px;}
+</style>
+</head>
+
+<body>
+<header><h1>📷 Escáner</h1></header>
+
+<div id="estado" class="tarjeta">Preparando cámara...</div>
+
+<div id="scanner" style="width:92%;max-width:420px;height:280px;margin:15px auto;position:relative;overflow:hidden;border-radius:12px;background:#000;"></div>
+<div style="position:relative;margin-top:-245px;height:230px;pointer-events:none;">
+<div style="position:absolute;left:8%;right:8%;top:25%;height:50%;border:3px solid #00ff66;border-radius:8px;box-shadow:0 0 12px #00ff66;"></div>
+</div>
+<div style="text-align:center;font-size:14px;margin:8px;color:#555">🎯 Enfoque el código dentro del marco • Acérquelo a 10-15 cm</div>
+
+<div id="resultado" class="tarjeta"></div>
+
+<button onclick="window.location.href='inicio.html'">⬅ Volver</button>
+
+<script>
+let activo=false;
+let ultimoCodigo="";
+let ultimoTiempo=0;
+let lecturasConfirmadas=0;
+
+window.addEventListener("load",()=>{
+ iniciarScanner();
+});
+
+function iniciarScanner(){
+
+ const estado=document.getElementById("estado");
+
+ if(typeof Quagga==="undefined"){
+   estado.innerHTML="❌ No se pudo cargar el lector";
+   return;
+ }
+
+ estado.innerHTML="📷 Abriendo cámara...";
+
+ Quagga.init({
+   inputStream:{
+     type:"LiveStream",
+     target:document.querySelector("#scanner"),
+     constraints:{
+       facingMode:{ideal:"environment"},
+       width:{min:640, ideal:1280},
+       height:{min:480, ideal:720}
+     }
+   },
+   locator:{
+     patchSize:"medium",
+     halfSample:true
+   },
+   numOfWorkers:navigator.hardwareConcurrency || 4,
+   frequency:5,
+   decoder:{
+     readers:[
+       "code_128_reader",
+       "ean_reader",
+       "ean_8_reader",
+       "upc_reader",
+       "upc_e_reader",
+       "code_39_reader",
+       "codabar_reader",
+       "2of5_reader"
+     ]
+   },
+   locate:true
+
+ },function(err){
+
+   if(err){
+     console.error(err);
+     estado.innerHTML="❌ No se pudo abrir la cámara";
+     return;
+   }
+
+   Quagga.start();
+
+   // Intentar activar enfoque continuo en móviles compatibles
+   setTimeout(()=>{
+     try{
+       const track=Quagga.CameraAccess.getActiveTrack();
+       if(track && track.applyConstraints){
+         track.applyConstraints({
+           advanced:[{focusMode:"continuous"}]
+         });
+       }
+     }catch(e){
+       console.log("Enfoque continuo no disponible",e);
+     }
+   },1000);
+
+   activo=true;
+   estado.innerHTML="✅ Cámara activa. Apunte al código";
+
+ });
+
+
+ 
+function emitirBeep(){
+ try{
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const gain=ctx.createGain();
+  gain.gain.value=0.18;
+  const osc1=ctx.createOscillator();
+  const osc2=ctx.createOscillator();
+  osc1.type="square";
+  osc2.type="square";
+  osc1.frequency.value=1400;
+  osc2.frequency.value=900;
+  osc1.connect(gain);
+  osc2.connect(gain);
+  gain.connect(ctx.destination);
+  osc1.start();
+  osc1.stop(ctx.currentTime+0.08);
+  osc2.start(ctx.currentTime+0.08);
+  osc2.stop(ctx.currentTime+0.16);
+ }catch(e){console.log(e);}
+}
+
+Quagga.onProcessed(function(result){
+   // mantiene el motor activo y permite detectar aunque el cuadro cambie
+});
+
+Quagga.onDetected(function(data){
+
+   if(!activo) return;
+
+   const codigo=data.codeResult.code;
+   const ahora=Date.now();
+
+   if(codigo===ultimoCodigo && ahora-ultimoTiempo<1500) return;
+
+   ultimoCodigo=codigo;
+   ultimoTiempo=ahora;
+
+   emitirBeep();
+   if(navigator.vibrate) navigator.vibrate(120);
+
+   estado.innerHTML="✅ Código detectado: "+codigo;
+
+   if(localStorage.getItem("modoEscaneoProducto")==="1"){
+      localStorage.setItem("codigoEscaneadoProducto",codigo);
+      localStorage.removeItem("modoEscaneoProducto");
+      window.location.href="administracion.html";
+      return;
+   }
+
+   if(typeof buscarCodigo==="function"){
+      buscarCodigo(codigo);
+   }
+
+ });
+
+}
+
+
+function detenerScanner(){
+ if(typeof Quagga!=="undefined"){
+   Quagga.stop();
+ }
+ activo=false;
+}
+
+</script>
+
+<script src="ticket_canvas.js"></script>
+
+</body>
+</html>
